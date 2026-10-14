@@ -1,0 +1,9 @@
+flask
+gunicorn
+openai
+python-dotenv
+pypdfium2
+yt_dlp
+youtube-transcript-api
+python-docx
+ultralytics

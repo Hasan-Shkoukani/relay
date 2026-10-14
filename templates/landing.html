@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Relay — talk to your X-rays, documents and videos</title>
+  <meta name="description" content="Upload a dental X-ray, a document, a photo or a YouTube link and ask questions about it, typed or spoken.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    .xray rect { animation: mark 0.35s ease-out both; animation-delay: calc(0.6s + var(--i) * 0.12s); }
+    @keyframes mark { from { opacity: 0; } to { opacity: 1; } }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="wordmark" href="{{ url_for('landing') }}">Relay</a>
+    <nav class="site-nav" aria-label="Main">
+      <a href="#reads">What it reads</a>
+      <a href="#accuracy">X-ray accuracy</a>
+      <a class="btn" href="{{ url_for('index') }}">Open Relay</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>Show it an <span class="nobr">X-ray.</span> Ask what it sees.</h1>
+      <p class="hero-lede">Relay looks at dental radiographs, documents, photos and YouTube videos, then answers your questions in plain language. Type them or just say them out loud.</p>
+      <div class="hero-actions">
+        <a class="btn" href="{{ url_for('index') }}#image">Upload an X-ray</a>
+        <a class="btn btn-ghost" href="{{ url_for('index') }}#files">Ask about a document</a>
+      </div>
+
+      <figure class="film" aria-label="Example: a panoramic X-ray with findings marked, and a question about it">
+        <div class="film-image">
+          <div class="xray" id="xray">
+            <img src="{{ url_for('static', filename='img/sample-xray.jpg') }}" width="1024" height="512"
+                 alt="Panoramic dental X-ray with fillings, an implant and an impacted tooth marked by the model">
+            <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+              <!-- the model's real detections on this image, in percent of width/height -->
+              <rect data-cls="fillings" style="--i:0;stroke:var(--fillings)" x="27.40" y="39.22" width="3.79" height="4.92"/>
+              <rect data-cls="fillings" style="--i:1;stroke:var(--fillings)" x="31.27" y="38.02" width="4.89" height="5.62"/>
+              <rect data-cls="implant"  style="--i:2;stroke:var(--implant)"  x="39.29" y="55.56" width="4.81" height="20.49"/>
+              <rect data-cls="fillings" style="--i:3;stroke:var(--fillings)" x="56.47" y="40.73" width="5.06" height="5.73"/>
+              <rect data-cls="fillings" style="--i:4;stroke:var(--fillings)" x="56.58" y="54.87" width="2.60" height="2.51"/>
+              <rect data-cls="fillings" style="--i:5;stroke:var(--fillings)" x="64.32" y="40.36" width="4.40" height="6.04"/>
+              <rect data-cls="impacted" style="--i:6;stroke:var(--impacted)" x="14.60" y="51.83" width="8.39" height="14.31"/>
+            </svg>
+          </div>
+          <ul class="legend" aria-label="Highlight a finding">
+            <li><button type="button" data-cls="fillings" aria-pressed="false" style="color:var(--fillings)"><span class="swatch"></span><span style="color:var(--film-text)">Fillings</span> <span class="count">5</span></button></li>
+            <li><button type="button" data-cls="implant" aria-pressed="false" style="color:var(--implant)"><span class="swatch"></span><span style="color:var(--film-text)">Implant</span> <span class="count">1</span></button></li>
+            <li><button type="button" data-cls="impacted" aria-pressed="false" style="color:var(--impacted)"><span class="swatch"></span><span style="color:var(--film-text)">Impacted tooth</span> <span class="count">1</span></button></li>
+            <li><button type="button" data-cls="cavity" aria-pressed="false" style="color:var(--cavity)"><span class="swatch"></span><span style="color:var(--film-text)">Cavity</span> <span class="count">none found</span></button></li>
+          </ul>
+        </div>
+        <figcaption class="film-talk">
+          <div class="q">What do you see on this X-ray?</div>
+          <div class="a">I see several dental restorations: 5 fillings, 1 implant in the lower front, and 2 crowns. The model also marked 1 impacted tooth in the lower right. No cavity was detected.
+            <span class="film-from">From the dental detection model</span>
+          </div>
+          <div class="q">Is the implant something I should worry about?</div>
+          <div class="a">By itself, that finding doesn’t mean it’s a problem. If you’re having pain, swelling, looseness, or trouble biting around it, that would be worth a dental check.
+            <span class="film-from">From the dental detection model</span>
+          </div>
+          <p class="source">Relay’s real answers on a test X-ray it had never seen, the second one trimmed for length.</p>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="section" id="reads">
+      <h2>One conversation, whatever you bring</h2>
+      <p>Load something once and ask as many follow-ups as you like. Every answer shows where it came from: the model’s finding, the page, the moment in the video or the knowledge base entry. If the answer isn’t in what you gave it, Relay answers from general knowledge and labels it, instead of leaving you with “I don’t know”.</p>
+      <dl class="reads">
+        <div>
+          <dt><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="m3 17 5-5 4 4 3-3 6 6"/></svg>X-rays and photos</dt>
+          <dd>Upload a picture or take one with your camera. Panoramic dental X-rays are also checked for fillings, implants, cavities and impacted teeth.</dd>
+        </div>
+        <div>
+          <dt><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/><path d="M14 3v5h5"/></svg>Documents</dt>
+          <dd>PDF, Word or plain text up to 50 MB. Answers cite the page, paragraph or line they came from.</dd>
+        </div>
+        <div>
+          <dt><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="14" height="14" rx="2"/><path d="m17 9 4-2.5v11L17 15"/></svg>YouTube videos</dt>
+          <dd>Paste a link to a video under an hour. Answers link to the exact moment, so you can check it.</dd>
+        </div>
+        <div>
+          <dt><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4h16v12H8l-4 4V4Z"/></svg>Knowledge base</dt>
+          <dd>Ask about Near East University straight away, no upload needed. Answers name the entry they came from, and anything it doesn’t cover is searched online with the pages linked.</dd>
+        </div>
+        <div>
+          <dt><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z"/><path d="M19 11a7 7 0 0 1-14 0M12 18v3"/></svg>Voice</dt>
+          <dd>Press the microphone to ask out loud, and press Listen on any answer to hear it read back.</dd>
+        </div>
+      </dl>
+    </section>
+
+    <section class="section" id="accuracy">
+      <h2>How an <span class="nobr">X-ray</span> gets read</h2>
+      <ol class="steps">
+        <li><strong>The dental model goes first.</strong> It marks fillings, implants, cavities and impacted teeth, and answers come from its findings.</li>
+        <li><strong>GPT vision looks next</strong>, only when the model has no answer: for photos that aren’t X-rays, or questions the findings don’t cover.</li>
+        <li><strong>General knowledge is the last resort</strong>, and it’s labelled, so you always know it didn’t come from your image.</li>
+      </ol>
+      <h3 class="sub-h">How far to trust the findings</h3>
+      <p>We downloaded eleven pretrained dental models, scored the seven that look for these findings on 194 panoramic X-rays none of them had seen, and kept the most accurate. Each bar shows how reliably it says whether a finding is in an image (F1 score, where 1.00 is perfect).</p>
+      <ul class="scores">
+        <li class="score" style="--c:var(--fillings);--v:0.93"><span class="score-name"><span class="swatch"></span>Fillings</span><span class="score-bar"><span></span></span><span class="score-val">0.93</span></li>
+        <li class="score" style="--c:var(--cavity);--v:0.56"><span class="score-name"><span class="swatch"></span>Cavity</span><span class="score-bar"><span></span></span><span class="score-val">0.56</span></li>
+        <li class="score" style="--c:var(--impacted);--v:0.50"><span class="score-name"><span class="swatch"></span>Impacted tooth</span><span class="score-bar"><span></span></span><span class="score-val">0.50</span></li>
+        <li class="score" style="--c:var(--implant);--v:0.39"><span class="score-name"><span class="swatch"></span>Implant</span><span class="score-bar"><span></span></span><span class="score-val">0.39</span></li>
+      </ul>
+      <p class="caveat">Fillings are dependable. Treat cavities, impacted teeth and implants as a second look, not a verdict. Relay gives general information, not a diagnosis, so have a dentist confirm anything that matters.</p>
+    </section>
+
+    <div class="closing">
+      <p>Bring an <span class="nobr">X-ray</span>, a PDF or a lecture video and start asking.</p>
+      <a class="btn" href="{{ url_for('index') }}">Open Relay</a>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>X-ray model: <a href="https://huggingface.co/lukasiktar11/dental-radiography-yolo26">dental-radiography-yolo26</a> by lukasiktar11, AGPL-3.0. Sample radiographs: <a href="https://www.kaggle.com/datasets/imtkaggleteam/dental-radiography">Dental Radiography dataset</a> (CC BY-SA 4.0); <a href="https://commons.wikimedia.org/wiki/File:Orthopantomogram_showing_mesio_angular_impaction_of_third_molars.jpg">Challiyan</a> (CC BY-SA 4.0) and <a href="https://commons.wikimedia.org/wiki/File:Orthopantomogram_of_an_abscessed_tooth.jpg">O'Dea</a> (CC BY-SA 3.0) on Wikimedia Commons.</p>
+    <p>Relay gives general information and is not a medical device or a substitute for a dentist.</p>
+  </footer>
+
+  <script>
+    // legend: highlight one class's boxes on the film
+    (() => {
+      const xray = document.getElementById('xray');
+      const buttons = [...document.querySelectorAll('.legend button')];
+      buttons.forEach(btn => btn.addEventListener('click', () => {
+        const on = btn.getAttribute('aria-pressed') !== 'true';
+        buttons.forEach(b => b.setAttribute('aria-pressed', String(on && b === btn)));
+        xray.classList.toggle('dim', on);
+        xray.querySelectorAll('rect').forEach(r => r.classList.toggle('on', on && r.dataset.cls === btn.dataset.cls));
+      }));
+    })();
+  </script>
+</body>
+</html>

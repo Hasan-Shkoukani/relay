@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Relay — workspace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="app-body">
+  <header class="site-header">
+    <a class="wordmark" href="{{ url_for('landing') }}">Relay</a>
+    <nav class="site-nav" aria-label="Main">
+      <a href="{{ url_for('landing') }}#accuracy">How accurate is it?</a>
+    </nav>
+  </header>
+
+  <main class="workspace">
+    <h1 class="visually-hidden">Relay workspace</h1>
+
+    <!-- left: what you're asking about -->
+    <section class="source-pane" aria-label="Source">
+      <nav class="tabs" role="tablist" aria-label="What to ask about">
+        <button class="tab" data-mode="image" role="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="m3 17 5-5 4 4 3-3 6 6"/></svg>
+          X-ray or photo
+        </button>
+        <button class="tab" data-mode="files" role="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/><path d="M14 3v5h5"/></svg>
+          Document
+        </button>
+        <button class="tab" data-mode="video" role="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="5" width="14" height="14" rx="2"/><path d="m17 9 4-2.5v11L17 15"/></svg>
+          Video
+        </button>
+        <button class="tab" data-mode="text" role="tab">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 4h16v12H8l-4 4V4Z"/></svg>
+          Knowledge
+        </button>
+      </nav>
+
+      <div class="panel">
+        <!-- X-ray / photo -->
+        <section id="upload-image" class="upload" hidden>
+          <h2 class="upload-title">Upload a dental <span class="nobr">X-ray</span> or any photo</h2>
+          <p class="upload-hint">The dental model reads it first. If it isn't an <span class="nobr">X-ray</span>, GPT vision describes it instead.</p>
+          <label class="dropzone" id="dropzone-image">
+            <span class="dropzone-label">Drop an image here, or click to browse</span>
+            <span class="dropzone-sub">JPG or PNG, up to 20 MB. Panoramic X-rays work best.</span>
+            <input type="file" id="image-input" accept="image/*">
+          </label>
+          <div class="row-actions">
+            <button class="btn btn-ghost" id="camera-open-btn" type="button">Use camera</button>
+          </div>
+          <div class="camera-box" id="camera-live" hidden>
+            <video id="camera-video" autoplay muted playsinline></video>
+            <div class="row-actions">
+              <button class="btn" id="camera-shoot-btn" type="button">Take photo</button>
+              <button class="btn btn-ghost" id="camera-close-btn" type="button">Cancel</button>
+            </div>
+          </div>
+          <div class="camera-box" id="image-preview-box" hidden>
+            <img class="preview" id="image-preview" alt="The image you picked">
+            <div class="row-actions">
+              <span class="picked-name" id="image-picked-name"></span>
+              <button class="btn btn-ghost" id="image-remove-btn" type="button">Remove</button>
+              <button class="btn" id="image-load-btn" type="button">Analyze</button>
+            </div>
+          </div>
+          <div class="samples">
+            <span class="samples-label">No X-ray handy? Try one:</span>
+            <button type="button" class="suggestion" data-sample="{{ url_for('static', filename='samples/impacted-wisdom-teeth.jpg') }}">Impacted wisdom teeth</button>
+            <button type="button" class="suggestion" data-sample="{{ url_for('static', filename='samples/fillings-and-bone-loss.jpg') }}">Fillings and bone loss</button>
+            <button type="button" class="suggestion" data-sample="{{ url_for('static', filename='samples/implant-and-fillings.jpg') }}">Implant and fillings</button>
+          </div>
+          <p class="upload-note">The dental model looks for <em>fillings</em>, <em>implants</em>, <em>cavities</em> and <em>impacted teeth</em>. It's most reliable for fillings, so treat the rest as a second look. Not a diagnosis.</p>
+        </section>
+
+        <!-- document -->
+        <section id="upload-files" class="upload" hidden>
+          <h2 class="upload-title">Upload a document</h2>
+          <p class="upload-hint">Answers point to the page, paragraph or line they came from.</p>
+          <label class="dropzone" id="dropzone-files">
+            <span class="dropzone-label">Drop a file here, or click to browse</span>
+            <span class="dropzone-sub">PDF, DOCX or TXT, up to 50 MB</span>
+            <input type="file" id="document-input" accept=".pdf,.docx,.txt,.text,.md">
+          </label>
+          <div class="row-actions">
+            <span class="picked-name" id="files-picked-name"></span>
+            <button class="btn" id="files-load-btn" type="button" disabled>Read document</button>
+          </div>
+        </section>
+
+        <!-- video -->
+        <section id="upload-video" class="upload" hidden>
+          <h2 class="upload-title">Paste a YouTube link</h2>
+          <p class="upload-hint">Videos up to an hour. Answers link to the moment they came from.</p>
+          <div class="field">
+            <label for="video-url-input">YouTube URL</label>
+            <input type="url" id="video-url-input" placeholder="https://www.youtube.com/watch?v=…" autocomplete="off">
+          </div>
+          <button class="btn" id="video-load-btn" type="button" disabled>Load video</button>
+        </section>
+
+        <!-- knowledge -->
+        <section id="upload-text" class="upload" hidden>
+          <h2 class="upload-title">Ask the knowledge base</h2>
+          <p class="upload-hint">Facts about Near East University, ready to ask with no upload. Answers name the entry they came from. If the answer isn't there, Relay searches the web and links the pages it used.</p>
+        </section>
+
+        <!-- loaded result -->
+        <section id="result" hidden>
+          <div class="source-chip">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+            <div class="chip-text">
+              <span class="name" id="result-name"></span>
+              <span class="chip-sub" id="result-sub"></span>
+            </div>
+            <button class="btn-icon" id="source-clear-btn" type="button" title="Remove and load something else" aria-label="Remove and load something else">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 6l12 12M18 6 6 18"/></svg>
+            </button>
+          </div>
+          <img class="xray-result" id="xray-result" alt="Your X-ray with the model's findings marked" hidden>
+          <ul class="findings" id="findings" aria-label="What the dental model found" hidden></ul>
+          <p class="upload-note" id="findings-note" hidden>Automated findings, not a diagnosis. Have a dentist confirm anything that matters.</p>
+        </section>
+      </div>
+    </section>
+
+    <!-- right: the conversation -->
+    <section class="chat-pane" aria-label="Conversation">
+      <div class="thread" id="thread" aria-live="polite">
+        <div class="thread-empty" id="thread-empty">
+          <p id="thread-empty-text"></p>
+          <div class="suggestions" id="suggestions"></div>
+        </div>
+      </div>
+
+      <form class="composer" id="composer">
+        <label for="question-input" class="visually-hidden">Your question</label>
+        <textarea id="question-input" rows="1" placeholder="Ask a question…" disabled></textarea>
+        <button type="button" class="btn-icon mic-btn" id="mic-btn" title="Ask out loud" aria-label="Ask out loud">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z"/><path d="M19 11a7 7 0 0 1-14 0M12 18v3"/></svg>
+        </button>
+        <button type="submit" class="btn-icon" id="send-btn" title="Send" aria-label="Send" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12h16M14 6l6 6-6 6"/></svg>
+        </button>
+      </form>
+      <div class="mic-status" id="mic-status" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

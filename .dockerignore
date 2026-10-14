@@ -1,0 +1,8 @@
+.env
+.venv
+venv
+__pycache__
+*.webm
+*.mp3
+sample.pdf
+.git
