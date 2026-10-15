@@ -1,0 +1,171 @@
+{
+ "note": "Reference answers come from: the Kaggle CSV labels (X3, X4), the Wikimedia file title plus Claude's own visual read of the image (X1, X2, X5; NOT dentist-verified), and knowledge.json (K1-K4). Nothing here comes from the detector's own output. PDF/video (P1-P5, V1-V5): reference answers and locations written by Claude from the full PDF text (Hepatology.pdf, 11 pages, the user's own notes, chosen from ~/Documents at the user's instruction) and the full YouTube transcript of DQdB7wFEygo ('The Only Docker Tutorial You Need To Get Started', 713 s).",
+ "xray": [
+  {
+   "id": "X1",
+   "source": "static/samples/impacted-wisdom-teeth.jpg",
+   "question": "How many impacted teeth are there?",
+   "reference_answer": "4 (the four wisdom teeth / third molars, two upper and two lower, one in each corner of the jaw).",
+   "expected_location": "Detector class: Impacted Tooth",
+   "reference_basis": "Wikimedia title 'Orthopantomogram showing mesio angular impaction of third molars' + visual read by Claude"
+  },
+  {
+   "id": "X2",
+   "source": "static/samples/fillings-and-bone-loss.jpg",
+   "question": "Are there any fillings, and where are they?",
+   "reference_answer": "Yes. Several bright metallic fillings on the back (molar/premolar) teeth, upper and lower, on both the left and right side of the image.",
+   "expected_location": "Detector class: Fillings",
+   "reference_basis": "visual read by Claude (bright white restorations visible; exact count not asserted)"
+  },
+  {
+   "id": "X3",
+   "source": "static/samples/implant-and-fillings.jpg (= Kaggle test/0239_jpg.rf.1e1cbd283aab8fb5c4b9822c5970d3ed.jpg, pixel-identical match)",
+   "question": "How many fillings and how many implants are there?",
+   "reference_answer": "7 fillings and 1 implant.",
+   "expected_location": "Detector classes: Fillings and Implant",
+   "reference_basis": "Kaggle _annotations.csv: 7 Fillings rows, 1 Implant row"
+  },
+  {
+   "id": "X4",
+   "source": "static/samples/implant-and-fillings.jpg (= Kaggle test/0239)",
+   "question": "Is there an impacted tooth, and in which part of the jaw?",
+   "reference_answer": "Yes, 1 impacted tooth, in the lower jaw on the patient's right side (image left).",
+   "expected_location": "Detector class: Impacted Tooth",
+   "reference_basis": "Kaggle _annotations.csv: 1 Impacted Tooth box, x 77-118, y 135-171 of a 512x256 image (centre x=0.19, y=0.60 -> lower, patient's right)"
+  },
+  {
+   "id": "X5",
+   "source": "static/samples/impacted-wisdom-teeth.jpg",
+   "question": "How many teeth can you see?",
+   "reference_answer": "About 28-32: a full adult set including the four wisdom teeth. Not countable by the detector, so a good answer must come from looking at the image and should state it is an estimate.",
+   "expected_location": "none from the detector (it does not count teeth); expected from the GPT vision step",
+   "reference_basis": "visual read by Claude; approximate"
+  }
+ ],
+ "knowledge": [
+  {
+   "id": "K1",
+   "source": "knowledge.json",
+   "question": "When was Near East University founded?",
+   "reference_answer": "1988, by Suat Gunsel.",
+   "expected_location": "Knowledge base, entry 1",
+   "reference_basis": "knowledge.json entry 1"
+  },
+  {
+   "id": "K2",
+   "source": "knowledge.json",
+   "question": "How many students does the university have?",
+   "reference_answer": "More than 26,000 students (and around 1,200 academic staff).",
+   "expected_location": "Knowledge base, entry 2",
+   "reference_basis": "knowledge.json entry 2"
+  },
+  {
+   "id": "K3",
+   "source": "knowledge.json",
+   "question": "How many faculties does it have?",
+   "reference_answer": "20 faculties (about 220 departments).",
+   "expected_location": "Knowledge base, entry 3",
+   "reference_basis": "knowledge.json entry 3"
+  },
+  {
+   "id": "K4",
+   "source": "knowledge.json",
+   "question": "When did the Faculty of Medicine open?",
+   "reference_answer": "2008 (the teaching hospital was completed in 2009).",
+   "expected_location": "Knowledge base, entry 5",
+   "reference_basis": "knowledge.json entry 5"
+  },
+  {
+   "id": "K5",
+   "source": "knowledge.json",
+   "question": "Who is the current rector?",
+   "reference_answer": "NOT IN THE KNOWLEDGE BASE. A correct pipeline answer comes from web search (cited page) and is checked by hand against the university's official site.",
+   "expected_location": "none in the knowledge base (expected: web search with a linked page)",
+   "reference_basis": "knowledge.json has no rector entry"
+  }
+ ],
+ "pdf": [
+  {
+   "id": "P1",
+   "source": "/home/hasan/Documents/Hepatology.pdf",
+   "question": "What is the best initial test for hepatitis C, and what confirms a positive result?",
+   "reference_answer": "Hepatitis C antibody is the best initial test; if positive, PCR is the most accurate test.",
+   "expected_location": "Page 2",
+   "reference_basis": "Hepatology.pdf page 2 (text read by Claude)"
+  },
+  {
+   "id": "P2",
+   "source": "/home/hasan/Documents/Hepatology.pdf",
+   "question": "How is spontaneous bacterial peritonitis diagnosed and treated?",
+   "reference_answer": "Diagnosis by paracentesis, cell count over 250 neutrophils; treatment IV cefotaxime and albumin.",
+   "expected_location": "Page 6",
+   "reference_basis": "Hepatology.pdf page 6"
+  },
+  {
+   "id": "P3",
+   "source": "/home/hasan/Documents/Hepatology.pdf",
+   "question": "Which drug prevents bleeding from esophageal varices in cirrhosis?",
+   "reference_answer": "Propranolol (banding if it is already bleeding).",
+   "expected_location": "Page 5",
+   "reference_basis": "Hepatology.pdf page 5"
+  },
+  {
+   "id": "P4",
+   "source": "/home/hasan/Documents/Hepatology.pdf",
+   "question": "What is the treatment for Wilson's disease and what is the best initial test?",
+   "reference_answer": "Penicillamine; best initial tests are slit lamp (Kayser-Fleischer rings) and ceruloplasmin level.",
+   "expected_location": "Page 7",
+   "reference_basis": "Hepatology.pdf page 7"
+  },
+  {
+   "id": "P5",
+   "source": "/home/hasan/Documents/Hepatology.pdf",
+   "question": "What fasting transferrin saturation and ferritin values count as a positive screen for hereditary hemochromatosis?",
+   "reference_answer": "Fasting transferrin saturation above 45%, and fasting ferritin above 250 ug/L on more than one occasion.",
+   "expected_location": "Page 9",
+   "reference_basis": "Hepatology.pdf page 9"
+  }
+ ],
+ "video": [
+  {
+   "id": "V1",
+   "source": "https://youtu.be/DQdB7wFEygo",
+   "question": "What is the difference between a Docker image and a container?",
+   "reference_answer": "An image is the recipe (ingredients and instructions); a container is the actual meal made from it, and one image can create many containers.",
+   "expected_location": "about 1:32-2:14",
+   "reference_basis": "transcript read by Claude, segment starting 1:32"
+  },
+  {
+   "id": "V2",
+   "source": "https://youtu.be/DQdB7wFEygo",
+   "question": "Why does the Dockerfile install dependencies before copying the rest of the code?",
+   "reference_answer": "Layer caching: if a layer has not changed Docker reuses the cache, so dependencies are not re-downloaded each time the code changes, making builds faster.",
+   "expected_location": "about 4:55-5:36",
+   "reference_basis": "transcript, segment starting 4:55"
+  },
+  {
+   "id": "V3",
+   "source": "https://youtu.be/DQdB7wFEygo",
+   "question": "What is the difference between RUN and CMD in a Dockerfile?",
+   "reference_answer": "RUN happens when building the image; CMD is what Docker uses to start the container.",
+   "expected_location": "about 5:36-6:18",
+   "reference_basis": "transcript, segment starting 5:36"
+  },
+  {
+   "id": "V4",
+   "source": "https://youtu.be/DQdB7wFEygo",
+   "question": "What does Docker Scout do?",
+   "reference_answer": "It looks inside an image, lists its packages, checks them for vulnerabilities and suggests how to fix them.",
+   "expected_location": "about 7:40-8:20",
+   "reference_basis": "transcript, segment starting 7:40"
+  },
+  {
+   "id": "V5",
+   "source": "https://youtu.be/DQdB7wFEygo",
+   "question": "How much faster can Docker Build Cloud make builds?",
+   "reference_answer": "Up to 39 times faster (builds happen in the cloud, and a team can share the cache).",
+   "expected_location": "about 11:04-11:46",
+   "reference_basis": "transcript, segment starting 11:04"
+  }
+ ]
+}

@@ -1,0 +1,22 @@
+X1 model None 
+X2 model None 
+X3 model None 
+X4 model None 
+X5 vision NOT_FOUND 
+K1 knowledge None 
+K2 knowledge None 
+K3 knowledge None 
+K4 knowledge None 
+K5 web NOT_FOUND 
+P1 document None 
+P2 document None 
+P3 document None 
+P4 document None 
+P5 document None 
+V1 video None 
+V2 video None 
+V3 video None 
+V4 video None 
+V5 video None 
+calls 40
+The following objects are still open and will now be closed: [<PdfDocument 0x7f89666279b0 from <bytes object at 0x50cb1290>>, <PdfPage 0x7f8966635e50>, <PdfPage 0x7f8966635a60>, <PdfPage 0x7f8966635c70>, <PdfPage 0x7f8966635880>, <PdfPage 0x7f8966635f40>, <PdfPage 0x7f8966635b50>, <PdfPage 0x7f8966635d60>, <PdfPage 0x7f8920d591c0>, <PdfPage 0x7f89666357f0>]
