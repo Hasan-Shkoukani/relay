@@ -23,6 +23,7 @@ Every answer shows exactly where it came from.
 - [HTTP API](#http-api)
 - [Testing](#testing)
 - [Deployment](#deployment)
+- [Evaluation](#evaluation)
 - [Limitations](#limitations)
 - [Credits and licenses](#credits-and-licenses)
 
@@ -202,6 +203,43 @@ docker run -p 8000:8000 --env-file .env relay
 The image runs gunicorn (1 worker, 8 threads) as a non-root user, with `COOKIE_SECURE=1` and a health check, so serve
 it over HTTPS (or pass `-e COOKIE_SECURE=0`). It builds successfully but hasn't been run-tested. Loaded sources and rate
 limits live in process memory, which is why it runs one worker; to scale out, move them to Redis.
+
+## Evaluation
+
+A small evaluation of the dental detector and the answer pipeline, run on 2026-10-15 with `gpt-5.4-mini` and
+`text-embedding-3-small` (40 OpenAI calls). Scripts, raw outputs and per-question tables are in `report_eval/`
+(`results.md`, `failures.md`, `details.md`) in the main repository.
+
+**Detector** (194 Kaggle test + valid X-rays, image level, confidence 0.4; reproduces the F1 values above exactly):
+
+| Class | Precision | Recall | F1 |
+|---|---|---|---|
+| Fillings | 0.93 | 0.94 | 0.93 |
+| Cavity | 0.51 | 0.63 | 0.56 |
+| Impacted tooth | 0.53 | 0.48 | 0.50 |
+| Implant | 0.92 | 0.24 | 0.39 |
+
+Implants are the weak spot: 68 of the 90 images that contain one got no detection. Seven failures were inspected by
+hand (false positives next to large restorations or on upper wisdom teeth, false negatives on metal-heavy
+post/root-filled teeth). The causes given in `failures.md` are hypotheses, not verified.
+
+**Question answering** (20 questions: 5 X-ray, 5 knowledge base, 5 PDF, 5 video):
+
+| Source | Cited location supports the answer | Evasive, first source only → after full chain | Mean usefulness (1-5) |
+|---|---|---|---|
+| X-ray | 3/5 | 1/5 → 0/5 | 4.0 |
+| Knowledge base | 4/5 | 1/5 → 0/5 | 4.8 |
+| PDF | 5/5 | 0/5 → 0/5 | 5.0 |
+| Video | 5/5 | 0/5 → 0/5 | 4.8 |
+| **Total** | **17/20 (85%)** | **2/20 (10%) → 0/20** | **4.65** |
+
+- The fallback chain rescued both questions the first source could not answer (a tooth count via GPT vision, the
+  current rector via web search). The `HEDGE` filter itself never fired; both rejections were `NOT_FOUND` replies.
+- One clear failure: the detector found 5 fillings where the Kaggle label says 7, and the answer stated 5 without a
+  caveat. The chain only moves on after a hedge, refusal or `NOT_FOUND`, never after a confident wrong answer.
+- Caveats: only 20 questions; the PDF and video questions were written after reading their sources, so they are
+  easy; citation judgements and usefulness ratings were made by Claude and are awaiting human review; X-ray reference
+  answers for three images are a visual read, not dentist-verified.
 
 ## Limitations
 
